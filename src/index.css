@@ -1,0 +1,12 @@
+/* src/index.css */
+
+.bg-site {
+  /* Задаем мягкий фоновый цвет для исторической тематики */
+  background-color: #f4f4f2 !important;
+}
+
+/* Дополнительно: убираем стандартные синие рамки при клике на инпуты */
+.form-control:focus {
+  box-shadow: none !important;
+  border-color: #d1d1d1 !important;
+}
