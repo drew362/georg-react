@@ -10,3 +10,25 @@
   box-shadow: none !important;
   border-color: #d1d1d1 !important;
 }
+.card-link:hover .evaluate-card {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+}
+
+/* src/index.css */
+
+.bg-site {
+  background-color: #f4f4f2 !important;
+}
+
+/* Делает так, чтобы футер ВСЕГДА был прижат к самому низу экрана, даже если страница пустая */
+#root {
+  display: flex;
+  flex-direction: column;
+  min-vh-100: 100vh;
+}
+
+body {
+  margin: 0;
+  background-color: #f4f4f2;
+}

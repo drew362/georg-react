@@ -1,11 +1,15 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom'; 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
 import SearchTab from './components/SearchTab';
-import { ShopTab, BuybackTab, ContactsTab } from './components/OtherTabs';
+import ShopTab from './components/ShopTab'; 
+import { BuybackTab, ContactsTab } from './components/OtherTabs'; 
+import ProductDetail from './components/ProductDetail';
+import AdminPanel from './components/AdminPanel';
+
 
 function App() {
   return (
@@ -19,8 +23,10 @@ function App() {
           <Routes>
             <Route path="/" element={<SearchTab />} />
             <Route path="/shop" element={<ShopTab />} />
+            <Route path="/shop/:id" element={<ProductDetail />} /> 
             <Route path="/buyback" element={<BuybackTab />} />
             <Route path="/contacts" element={<ContactsTab />} />
+            <Route path="/admin-drew-panel" element={<AdminPanel />} />
             <Route path="*" element={<div className="text-center py-5"><h3>Страница не найдена (404)</h3></div>} />
           </Routes>
         </main>
@@ -32,3 +38,5 @@ function App() {
 }
 
 export default App;
+
+
