@@ -1,149 +1,120 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const AdminPanel = () => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
-  // ИСПРАВЛЕНО: Теперь состояние хранит массив выбранных файлов
-  const [files, setFiles] = useState([]); 
-  
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ text: '', type: '' });
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState(null); // null = создание
+  const [form, setForm] = useState({ title: '', description: '', price: '' });
+  const [files, setFiles] = useState([]); // Изначально пустой массив вместо null
 
-  // Обработчик выбора файлов с компьютера
-  const handleFileChange = (e) => {
-    if (e.target.files) {
-      // Превращаем FileList в стандартный массив JavaScript
-      setFiles(Array.from(e.target.files));
-    }
+  const api = 'http://localhost:8086/api/products';
+
+  const fetchProducts = async () => {
+    const res = await fetch(api);
+    if (res.ok) setProducts(await res.json());
+    setLoading(false);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    // Валидация обязательных текстовых полей
-    if (!title || !description) {
-      setMessage({ text: 'Название и описание обязательны для заполнения!', type: 'danger' });
-      return;
+  useEffect(() => { fetchProducts(); }, []);
+
+  const handleMode = (prod = null) => {
+    setSelected(prod);
+    setForm({ title: prod?.title || '', description: prod?.description || '', price: prod?.price || '' });
+    setFiles([]);
+    if (document.getElementById('fileInput')) document.getElementById('fileInput').value = '';
+  };
+
+  const handleAction = async (method, url, isDelete = false) => {
+    if (isDelete && !window.confirm('Вы уверены?')) return;
+
+    let body = null;
+    if (!isDelete) {
+      body = new FormData();
+      Object.keys(form).forEach(k => form[k] && body.append(k, form[k])); // Защита от отправки пустых полей
+      if (files && files.length > 0) files.forEach(f => body.append('file', f));
     }
-    
-    // Валидация: проверяем, что прикреплен хотя бы один файл
-    if (files.length === 0) {
-      setMessage({ text: 'Пожалуйста, выберите хотя бы одну фотографию предмета!', type: 'danger' });
-      return;
-    }
 
-    setLoading(true);
-    setMessage({ text: '', type: '' });
+    const res = await fetch(url, { method, body });
+    if (res.ok) {
+      alert('Успешно!');
+      handleMode();
+      fetchProducts();
+    } else alert('Ошибка сервера');
+  };
 
-    // Создаем объект FormData для отправки бинарных данных и текста вместе
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('description', description);
-    if (price) formData.append('price', price);
-    
-
-    files.forEach((file) => {
-      formData.append('file', file);
-    });
-
-    try {
-      const response = await fetch('http://localhost:8086/api/products', {
-        method: 'POST',
-        body: formData 
-      });
-
-      if (!response.ok) throw new Error('Ошибка сервера при публикации');
-
-      setMessage({ text: `Товар успешно опубликован! Загружено изображений: ${files.length} шт.`, type: 'success' });
-      
-      // Полная очистка формы при успехе
-      setTitle('');
-      setDescription('');
-      setPrice('');
-      setFiles([]);
-      // Сбрасываем поле выбора файлов на самом экране
-      document.getElementById('fileInput').value = '';
-
-    } catch (err) {
-      setMessage({ text: 'Не удалось отправить данные. Проверьте подключение к Spring Boot.', type: 'danger' });
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+  const deleteImg = async (url) => {
+    if (!window.confirm('Удалить фото?')) return;
+    const res = await fetch(`${api}/${selected.id}/images?imgUrl=${encodeURIComponent(url)}`, { method: 'DELETE' });
+    if (res.ok) {
+      // ИСПРАВЛЕНО: Создаем новый массив, чтобы React мгновенно убрал картинку с экрана
+      const updatedImages = Array.from(selected.imageUrls).filter(src => src !== url);
+      setSelected({ ...selected, imageUrls: updatedImages });
+      fetchProducts(); // Синхронизируем список на заднем плане
+    } else alert('Ошибка удаления фото');
   };
 
   return (
-    <div className="mx-auto w-100 py-3" style={{ maxWidth: '800px' }}>
-      <div className="card p-4 shadow-sm border-0 rounded-3 bg-white">
-        <h3 className="fw-bold text-dark mb-4 text-center">Панель добавления товаров (Магазин)</h3>
-        
-        {message.text && (
-          <div className={`alert alert-${message.type} border-0 rounded-3 p-3`} role="alert">
-            {message.text}
+    <div className="container-fluid py-4" style={{ maxWidth: '1400px' }}>
+      <div className="row g-4">
+        {/* Слева: Список */}
+        <div className="col-md-4 col-lg-3">
+          <div className="card shadow-sm p-3 bg-white" style={{ minHeight: '70vh' }}>
+            <button className={`btn w-100 mb-3 fw-bold ${!selected ? 'btn-success' : 'btn-outline-success'}`} onClick={() => handleMode()}>+ Новый товар</button>
+            <h6 className="text-muted fw-bold border-bottom pb-2">Товары ({products.length})</h6>
+            {loading ? <div className="text-center py-4"><div className="spinner-border spinner-border-sm text-success"></div></div> :
+              <div className="list-group overflow-y-auto" style={{ maxHeight: '60vh' }}>
+                {products.map(p => (
+                  <button key={p.id} onClick={() => handleMode(p)} className={`list-group-item list-group-item-action border-0 rounded-2 mb-2 p-2 text-start d-flex align-items-center justify-content-between ${selected?.id === p.id ? 'bg-success text-white fw-bold' : 'bg-light'}`}>
+                    <div className="text-truncate">#{p.id} {p.title}</div>
+                    {p.imageUrls?.[0] && <img src={p.imageUrls[0]} alt="" className="rounded" style={{ width: '35px', height: '35px', objectFit: 'cover' }} />}
+                  </button>
+                ))}
+              </div>}
           </div>
-        )}
+        </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label className="form-label fw-semibold text-secondary">Название предмета *</label>
-            <input 
-              type="text" 
-              className="form-control bg-light border-0 py-2" 
-              placeholder="Например: Георгиевский крест 3 степени"
-              value={title} 
-              onChange={(e) => setTitle(e.target.value)} 
-            />
-          </div>
+        {/* Справа: Форма */}
+        <div className="col-md-8 col-lg-9">
+          <div className="card shadow-sm p-4 bg-white">
+            <h3 className="fw-bold mb-4">{selected ? `Редактирование #${selected.id}` : 'Добавление товара'}</h3>
+            <form onSubmit={(e) => { e.preventDefault(); handleAction(selected ? 'PUT' : 'POST', selected ? `${api}/${selected.id}` : api); }}>
+              <div className="mb-3">
+                <label className="form-label fw-semibold">Название *</label>
+                <input type="text" className="form-control" value={form.title} onChange={e => setForm({...form, title: e.target.value})} required />
+              </div>
+              <div className="mb-3">
+                <label className="form-label fw-semibold">Описание *</label>
+                <textarea className="form-control" rows="4" value={form.description} onChange={e => setForm({...form, description: e.target.value})} required></textarea>
+              </div>
 
-          <div className="mb-3">
-            <label className="form-label fw-semibold text-secondary">Описание товара *</label>
-            <textarea 
-              className="form-control bg-light border-0" 
-              rows="5" 
-              placeholder="Опишите состояние, патину, металл, ленту и исторический контекст..."
-              value={description} 
-              onChange={(e) => setDescription(e.target.value)}
-            ></textarea>
-          </div>
-
-          <div className="row mb-4">
-            <div className="col-6">
-              <label className="form-label fw-semibold text-secondary">Цена (необязательно)</label>
-              <input 
-                type="number" 
-                className="form-control bg-light border-0 py-2" 
-                placeholder="В рублях"
-                value={price} 
-                onChange={(e) => setPrice(e.target.value)} 
-              />
-            </div>
-            <div className="col-6">
-              <label className="form-label fw-semibold text-secondary">Фотографии предмета *</label>
-              <input 
-                id="fileInput"
-                type="file" 
-                accept="image/*" 
-                multiple // 🔥 Позволяет выбирать много картинок сразу через Ctrl или Shift
-                className="form-control bg-light border-0 py-2" 
-                onChange={handleFileChange}
-              />
-              {files.length > 0 && (
-                <div className="form-text text-success fw-medium mt-1">
-                  Выбрано файлов: {files.length}
+              {/* Облачные фото */}
+              {selected?.imageUrls?.length > 0 && (
+                <div className="mb-3">
+                  <label className="form-label fw-semibold text-success">Фото в облаке (Клик на [х] для удаления):</label>
+                  <div className="d-flex flex-wrap gap-2 p-2 bg-light rounded">
+                    {selected.imageUrls.map((url, idx) => (
+                      <div key={idx} className="position-relative" style={{ width: '60px', height: '60px' }}>
+                        <img src={url} alt="" className="w-100 h-100 object-fit-cover rounded border" />
+                        <button type="button" className="btn btn-danger btn-sm position-absolute top-0 end-0 p-0 d-flex align-items-center justify-content-center rounded-circle" style={{ width: '18px', height: '18px', fontSize: '10px', marginTop: '-4px', marginRight: '-4px' }} onClick={() => deleteImg(url)}>✕</button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
-            </div>
-          </div>
 
-          <button 
-            type="submit" 
-            className="btn btn-success w-100 fw-bold py-2 shadow-sm rounded-3 fs-5"
-            disabled={loading}
-          >
-            {loading ? 'Загрузка файлов в Yandex Cloud S3...' : 'Опубликовать на сайт'}
-          </button>
-        </form>
+              <div className="row mb-4">
+                <div className="col-md-6"><label className="form-label fw-semibold">Цена</label><input type="number" className="form-control" value={form.price} onChange={e => setForm({...form, price: e.target.value})} /></div>
+                {/* ИСПРАВЛЕНО: Перевод FileList в массив в момент выбора файлов */}
+                <div className="col-md-6"><label className="form-label fw-semibold">Фото {selected ? '' : '*'}</label><input id="fileInput" type="file" className="form-control" multiple onChange={e => setFiles(e.target.files ? Array.from(e.target.files) : [])} required={!selected} /></div>
+              </div>
+
+              <div className="d-flex gap-3">
+                <button type="submit" className="btn btn-success fw-bold flex-grow-1">Сохранить</button>
+                {selected && <button type="button" className="btn btn-danger fw-bold px-4" onClick={() => handleAction('DELETE', `${api}/${selected.id}`, true)}>Удалить товар</button>}
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   );
