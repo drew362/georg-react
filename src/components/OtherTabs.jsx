@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-// ВКЛАДКА 1: СКУПКА И ОНЛАЙН-ОЦЕНКА (С интерактивной формой для Telegram)
 export function BuybackTab() {
   const [form, setForm] = useState({ name: '', phone: '', comment: '' });
   const [files, setFiles] = useState([]);
@@ -99,19 +98,46 @@ export function BuybackTab() {
   );
 }
 
-// ВКЛАДКА 2: ЧИСТАЯ КОНТАКТНАЯ ИНФОРМАЦИЯ
 export function ContactsTab() {
+  const realEmail = "kozinandrey@mail.ru";
+  const visibleEmail = "info@aquilon-antique.ru"; 
+  const emailSubject = encodeURIComponent("Запрос с сайта Аквилон");
+
   return (
     <div className="card p-5 shadow-sm border-0 rounded-3 bg-white mx-auto" style={{ maxWidth: '1100px' }}>
       <h2 className="fw-bold text-dark mb-4">Контактная информация</h2>
+      
       <div className="row g-4 text-secondary fs-5">
-        <div className="col-md-6">
+        <div className="col-md-4">
           <h5 className="fw-bold text-dark mb-2">Адрес офиса:</h5>
           <p className="text-dark">г. Москва, Армянский пер, д. 10</p>
         </div>
-        <div className="col-md-6">
+        
+        <div className="col-md-4">
           <h5 className="fw-bold text-dark mb-2">Телефон:</h5>
           <p className="text-dark fw-semibold">+7 (916) 703-57-55 (telegram, max)</p>
+        </div>
+
+        <div className="col-md-4">
+          <h5 className="fw-bold text-dark mb-2">Электронная почта:</h5>
+          <div className="d-flex align-items-center gap-2">
+            <a 
+              href={`mailto:${realEmail}?subject=${emailSubject}`}
+              className="btn btn-outline-success d-flex align-items-center justify-content-center rounded-circle p-0 text-decoration-none"
+              style={{ width: '42px', height: '42px', transition: '0.2s' }}
+              title="Написать нам письмо"
+            >
+              <i className="bi bi-envelope-fill fs-5"></i>
+            </a>
+
+            <a 
+              href={`mailto:${realEmail}?subject=${emailSubject}`}
+              className="text-dark text-decoration-none link-success" 
+              style={{ fontSize: '18px', transition: '0.2s' }}
+            >
+              {visibleEmail}
+            </a>
+          </div>
         </div>
       </div>
     </div>
