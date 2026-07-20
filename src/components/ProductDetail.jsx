@@ -13,7 +13,7 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`http://localhost:8086/api/products/${id}`);
+        const response = await fetch(`https://aquilon-antique.ru/api/products/${id}`);
         if (!response.ok) throw new Error('Товар не найден');
         const data = await response.json();
         setProduct(data);

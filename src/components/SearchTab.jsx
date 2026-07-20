@@ -32,7 +32,7 @@ const SearchTab = () => {
     setIsSearchTriggered(true);
 
     try {
-      const response = await fetch(`http://localhost:8086/api/search?query=${encodeURIComponent(query)}`);
+      const response = await fetch(`https://aquilon-antique.ru/api/search?query=${encodeURIComponent(query)}`);
       if (!response.ok) throw new Error('Ошибка сервера');
       const data = await response.json();
       setResults(data);

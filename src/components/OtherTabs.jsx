@@ -20,7 +20,7 @@ export function BuybackTab() {
     files.forEach(f => formData.append('file', f)); // Ключ 'file' строго совпадает с Java-контроллером
 
     try {
-      const res = await fetch('http://localhost:8086/api/appraisal', {
+      const res = await fetch('https://aquilon-antique.ru/api/appraisal', {
         method: 'POST',
         body: formData
       });
