@@ -32,7 +32,7 @@ const SearchTab = () => {
     setIsSearchTriggered(true);
 
     try {
-      const response = await fetch(`https://aquilon-antique.ru/api/search?query=${encodeURIComponent(query)}`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/search?query=${encodeURIComponent(query)}`);
       if (!response.ok) throw new Error('Ошибка сервера');
       const data = await response.json();
       setResults(data);
@@ -50,41 +50,58 @@ const SearchTab = () => {
       <form onSubmit={handleSearch} className="card p-4 p-md-5 shadow border-0 rounded-3 bg-white mb-5">
         <h2 className="mb-2 text-dark fw-bold text-center text-md-start">Поиск в архивных базах</h2>
         <p className="text-muted mb-4 text-center text-md-start">
-          Введите номер Георгиевского креста или фамилию кавалера для проверки по реестру.
+          Введите номер Георгиевского креста IV степени или фамилию кавалера для проверки по реестру.
         </p>
         
-        <div className="input-group input-group-lg position-relative">
-          <input
-            type="text"
-            className="form-control bg-light border-secondary-subtle pe-5"
-            placeholder="Например: 231440 или Симков..."
-            value={query}
-            onChange={handleInputChange}
-            style={{ borderRadius: '0.5rem 0 0 0.5rem', fontSize: '1.1rem' }}
-          />
+
+
+              {/* Внешний контейнер с флексом, чтобы инпут и кнопка стояли строго на одном уровне по линейке */}
+        <div className="d-flex align-items-stretch w-100" style={{ gap: '0' }}>
           
-          {/* Исправленная кнопка сброса (крестик) */}
-          {query && (
-            <button
-              type="button"
-              className="btn position-absolute border-0 text-secondary p-0 d-flex align-items-center justify-content-center"
-              onClick={handleClear}
+          {/* Изолированный контейнер поля ввода с крестиком */}
+          <div className="position-relative flex-grow-1">
+            <input
+              type="text"
+              className="form-control form-control-lg bg-light border-secondary-subtle h-100"
+              placeholder="Например: 231440 или Симков..."
+              value={query}
+              onChange={handleInputChange}
               style={{ 
-                right: '130px', 
-                top: '50%', 
-                transform: 'translateY(-50%)', 
-                zIndex: 10, 
-                width: '32px', 
-                height: '32px',
-                background: 'transparent' 
+                borderRadius: '0.5rem 0 0 0.5rem', 
+                fontSize: '1.1rem',
+                // Теперь Bootstrap не сбросит этот отступ, так как инпут находится вне input-group!
+                paddingRight: '50px' 
               }}
-            >
-              &#x2715;
-            </button>
-          )}
+            />
+            
+            {/* Кнопка сброса (крестик) — жестко привязана к правому краю поля ввода и никогда не сдвинется */}
+            {query && (
+              <button
+                type="button"
+                className="btn position-absolute border-0 text-secondary p-0 d-flex align-items-center justify-content-center"
+                onClick={handleClear}
+                style={{ 
+                  right: '15px', 
+                  top: '50%', 
+                  transform: 'translateY(-50%)', 
+                  zIndex: 10, 
+                  width: '24px', 
+                  height: '24px',
+                  background: 'transparent',
+                  fontSize: '1.1rem'
+                }}
+              >
+                &#x2715;
+              </button>
+            )}
+          </div>
           
-          <button type="submit" className="btn btn-success px-4 fw-bold shadow-sm d-flex align-items-center" style={{ borderRadius: '0 0.5rem 0.5rem 0' }}>
-            {/* SVG иконка лупы вместо Bootstrap-icons */}
+          {/* Зеленая кнопка поиска — прижата к инпуту без зазоров */}
+          <button 
+            type="submit" 
+            className="btn btn-success btn-lg px-4 fw-bold shadow-sm d-flex align-items-center flex-shrink-0" 
+            style={{ borderRadius: '0 0.5rem 0.5rem 0' }}
+          >
             <svg className="me-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -92,7 +109,11 @@ const SearchTab = () => {
             Искать
           </button>
         </div>
+
+        
       </form>
+
+
 
       {/* Лоадер */}
       {loading && (

@@ -20,13 +20,13 @@ export function BuybackTab() {
     files.forEach(f => formData.append('file', f)); // Ключ 'file' строго совпадает с Java-контроллером
 
     try {
-      const res = await fetch('https://aquilon-antique.ru/api/appraisal', {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/appraisal`, {
         method: 'POST',
         body: formData
       });
 
       if (res.ok) {
-        alert('Заявка отправлена! Эксперт антикварного магазина «Аквилон» свяжется с вами в течение 15 минут.');
+        alert('Заявка отправлена! Эксперт антикварного магазина «Аквилон» свяжется с вами.');
         setForm({ name: '', phone: '', comment: '' });
         setFiles([]);
         document.getElementById('appraisalFiles').value = '';

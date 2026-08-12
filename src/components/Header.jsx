@@ -3,69 +3,109 @@ import { NavLink, Link } from 'react-router-dom';
 
 function Header() {
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3 sticky-top">
-      <div className="container-fluid px-4 px-md-5">
-        <Link className="navbar-brand d-flex align-items-center" to="/">
-          {/* Логотип: Северная звезда (SVG) */}
-      <svg 
-  className="me-3 text-success" 
-  width="36" 
-  height="36" 
-  viewBox="0 0 100 110" 
-  fill="none" 
-  stroke="currentColor" 
-  strokeWidth="5" 
-  strokeLinecap="round" 
-  strokeLinejoin="round"
->
-  {/* Внешний контур ромба (основа узла Гунгнира) */}
-  <path d="M 50,5 L 95,50 L 50,95 L 5,50 Z" />
-  
-  {/* Пересекающиеся диагональные линии скандинавского плетения */}
-  <path d="M 20,50 L 80,50 M 50,20 L 50,80" />
-  
-  {/* Декоративные «усики» наконечника копья сверху и снизу */}
-  <path d="M 30,25 L 15,10 M 70,25 L 85,10" />
-  <path d="M 30,75 L 15,90 M 70,75 L 85,90" />
-  
-  {/* Внутренний центральный ромб */}
-  <path d="M 50,30 L 70,50 L 50,70 L 30,50 Z" strokeWidth="4" />
-</svg>
-
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-4">
+      <div className="container">
+        
+        {/* ЛОГОТИП САЙТА (Ваша картинка + Текст) */}
+        <Link 
+          to="/" 
+          className="d-flex align-items-center me-4" 
+          style={{ textDecoration: 'none', background: 'transparent' }}
+        >
+          {/* ИСПРАВЛЕНО: Вместо SVG вставляем картинку-герб из корня сайта */}
+         <div className="me-2" style={{ display: 'flex', alignItems: 'center' }}>
+            <img 
+              src="/favicon.png" 
+              alt="Логотип Аквилон" 
+              style={{ 
+                width: '32px', 
+                height: '32px', 
+                objectFit: 'contain',
+                // ИСПРАВЛЕНО: Этот фильтр на лету перекрашивает PNG в зеленый цвет #198754
+                filter: 'invert(42%) sepia(58%) saturate(541%) hue-rotate(99deg) brightness(93%) contrast(89%)'
+              }} 
+            />
+          </div>
           
-          {/* Блок с текстом в две строки */}
-          <div className="d-flex flex-column lh-sm">
-            <span className="fw-bold text-success fs-3">Аквилон</span>
-            <span className="text-white-50 fs-6 fw-normal text-uppercase tracking-wider" style={{ fontSize: '0.75rem' }}>
-              исторический архив и антиквариат
+          {/* ТЕКСТОВАЯ ЧАСТЬ */}
+          <div className="d-flex flex-column text-start">
+            <span className="fw-bold fs-4 lh-1" style={{ color: '#198754' }}>
+              Аквилон
+            </span>
+            <span 
+              className="fw-semibold text-uppercase" 
+              style={{ 
+                fontSize: 'calc(0.5rem + 0.3vw)', 
+                letterSpacing: '0.5px',
+                whiteSpace: 'nowrap',
+                color: '#6c757d'
+              }}
+            >
+              Исторический архив и антиквариат
             </span>
           </div>
         </Link>
-        
-        <div className="collapse navbar-collapse d-flex justify-content-end">
-          <ul className="navbar-nav mb-2 mb-lg-0 fw-semibold">
+
+        {/* Кнопка-бургер для мобильных устройств */}
+        <button 
+          className="navbar-toggler border-0 p-2" 
+          type="button" 
+          data-bs-toggle="collapse" 
+          data-bs-target="#navbarNav" 
+          aria-controls="navbarNav" 
+          aria-expanded="false" 
+          aria-label="Переключить навигацию"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+
+        {/* Меню навигации */}
+        <div className="collapse navbar-collapse" id="navbarNav">
+          <ul className="navbar-nav ms-auto text-start mt-2 mt-lg-0">
+            
             <li className="nav-item">
-              <NavLink className={({ isActive }) => `nav-link px-3 me-2 ${isActive ? 'text-success' : 'text-white-50'}`} to="/">
+              <NavLink 
+                to="/" 
+                end
+                className={({ isActive }) => `nav-link px-3 ${isActive ? 'text-success fw-bold' : 'text-secondary'}`}
+              >
                 Поиск наград
               </NavLink>
             </li>
+
             <li className="nav-item">
-              <NavLink className={({ isActive }) => `nav-link px-3 me-2 ${isActive ? 'text-success' : 'text-white-50'}`} to="/shop">
+              <NavLink 
+                to="/shop" 
+                end
+                className={({ isActive }) => `nav-link px-3 ${isActive ? 'text-success fw-bold' : 'text-secondary'}`}
+              >
                 Магазин
               </NavLink>
             </li>
+
             <li className="nav-item">
-              <NavLink className={({ isActive }) => `nav-link px-3 me-2 ${isActive ? 'text-success' : 'text-white-50'}`} to="/buyback">
+              <NavLink 
+                to="/buyback" 
+                end
+                className={({ isActive }) => `nav-link px-3 ${isActive ? 'text-success fw-bold' : 'text-secondary'}`}
+              >
                 Скупка и Оценка
               </NavLink>
             </li>
+
             <li className="nav-item">
-              <NavLink className={({ isActive }) => `nav-link px-3 ${isActive ? 'text-success' : 'text-white-50'}`} to="/contacts">
+              <NavLink 
+                to="/contacts" 
+                end
+                className={({ isActive }) => `nav-link px-3 ${isActive ? 'text-success fw-bold' : 'text-secondary'}`}
+              >
                 Контакты
               </NavLink>
             </li>
+
           </ul>
         </div>
+
       </div>
     </nav>
   );
