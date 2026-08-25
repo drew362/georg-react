@@ -16,7 +16,15 @@ const ShopTab = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentCategory = searchParams.get('category') || 'ALL';
 
+
+
   useEffect(() => {
+
+    const activeCat = CATEGORIES.find(c => c.key === currentCategory);
+    const catLabel = activeCat && currentCategory !== 'ALL' ? ` — ${activeCat.label}` : '';
+
+    document.title = `Магазин антиквариата и старинных монет${catLabel} — Архив Аквилон`;
+
     setStatus({ loading: true, error: '' });
     let apiUrl = `${import.meta.env.VITE_API_BASE_URL}/products`;
     if (currentCategory !== 'ALL') apiUrl += `?category=${currentCategory}`;
@@ -29,6 +37,9 @@ const ShopTab = () => {
       .then(data => { setProducts(data); setStatus({ loading: false, error: '' }); })
       .catch(() => setStatus({ loading: false, error: 'Не удалось загрузить каталог товаров. Проверьте запуск бэкенда.' }));
   }, [currentCategory]);
+
+
+
 
   const handleCategorySelect = (key) => {
     if (key === 'ALL') searchParams.delete('category');
