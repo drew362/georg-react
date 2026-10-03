@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Allow: /shop
+Allow: /buyback
+Allow: /contacts
+Disallow: /admin-drew-panel  # Закрываем админку от индексации поисковиками
+
+Sitemap: https://aquilon-antique.ru
